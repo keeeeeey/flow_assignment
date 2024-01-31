@@ -3,3 +3,26 @@ spring:
     view:
       prefix: /WEB-INF/views/
       suffix: .jsp
+
+  datasource:
+    #h2 setting
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:flow
+#    username: sa
+#    password:
+    #mysql setting
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://3.39.11.184:3306/flow?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    username: root
+    password: flow1234
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
+
+logging.level:
+  org.hibernate.SQL: debug
