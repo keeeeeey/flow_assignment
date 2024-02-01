@@ -21,8 +21,8 @@ for (let i = 0; i < checkboxList.length; i++) {
             })
         } else {
             $.ajax({
-                type: "delete",
-                url: "http://localhost:8080/" + value,
+                type: "DELETE",
+                url: "/" + value,
                 success: function (res) {
                     console.log(res);
                 },
@@ -30,6 +30,44 @@ for (let i = 0; i < checkboxList.length; i++) {
                     console.log(e);
                 }
             })
+        }
+    })
+}
+
+const addBtn = document.querySelector('#add-btn');
+addBtn.addEventListener("click", function () {
+    const value = document.querySelector('#extension-name').value;
+    if (!!value?.trim()) {
+        const data = {
+            'name': value
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/",
+            data: JSON.stringify(data),
+            contentType : 'application/json; charset=utf-8',
+            success: function (res) {
+                console.log(res);
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        })
+    } else {
+        alert("값을 입력해주세요.");
+    }
+})
+
+function deleteExtension (param) {
+    $.ajax({
+        type: "DELETE",
+        url: "/" + param,
+        success: function (res) {
+            console.log(res);
+        },
+        error: function (e) {
+            console.log(e);
         }
     })
 }

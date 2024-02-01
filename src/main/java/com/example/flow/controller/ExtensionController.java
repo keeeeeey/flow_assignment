@@ -16,7 +16,6 @@ public class ExtensionController {
 
     @PostMapping()
     public ResponseEntity<BaseResponseDto<Long>> createExtension(@RequestBody ExtensionRequestDto requestDto) {
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new BaseResponseDto<>(201, "success", extensionService.createExtension(requestDto)));
     }

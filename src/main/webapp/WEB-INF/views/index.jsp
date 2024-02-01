@@ -17,19 +17,74 @@
                 고정 확장자
             </div>
             <div class="fix-box-right">
-                <input type="checkbox" id="bat" class="fix-item" name="bat">
+                <c:choose>
+                    <c:when test="${not empty bat}">
+                        <input type="checkbox" id="bat" class="fix-item" name="bat" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="bat" class="fix-item" name="bat">
+                    </c:otherwise>
+                </c:choose>
                 <label for="bat">bat</label>
-                <input type="checkbox" id="cmd" class="fix-item" name="cmd">
+
+                <c:choose>
+                    <c:when test="${not empty cmd}">
+                        <input type="checkbox" id="cmd" class="fix-item" name="cmd" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="cmd" class="fix-item" name="cmd">
+                    </c:otherwise>
+                </c:choose>
                 <label for="cmd">cmd</label>
-                <input type="checkbox" id="com" class="fix-item" name="com">
+
+                <c:choose>
+                    <c:when test="${not empty com}">
+                        <input type="checkbox" id="com" class="fix-item" name="com" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="com" class="fix-item" name="com">
+                    </c:otherwise>
+                </c:choose>
                 <label for="com">com</label>
-                <input type="checkbox" id="cpl" class="fix-item" name="cpl">
+
+                <c:choose>
+                    <c:when test="${not empty cpl}">
+                        <input type="checkbox" id="cpl" class="fix-item" name="cpl" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="cpl" class="fix-item" name="cpl">
+                    </c:otherwise>
+                </c:choose>
                 <label for="cpl">cpl</label>
-                <input type="checkbox" id="exe" class="fix-item" name="exe">
+
+                <c:choose>
+                    <c:when test="${not empty exe}">
+                        <input type="checkbox" id="exe" class="fix-item" name="exe" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="exe" class="fix-item" name="exe">
+                    </c:otherwise>
+                </c:choose>
                 <label for="exe">exe</label>
-                <input type="checkbox" id="scr" class="fix-item" name="scr">
+
+                <c:choose>
+                    <c:when test="${not empty scr}">
+                        <input type="checkbox" id="scr" class="fix-item" name="scr" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="scr" class="fix-item" name="scr">
+                    </c:otherwise>
+                </c:choose>
                 <label for="scr">scr</label>
-                <input type="checkbox" id="js" class="fix-item" name="js">
+
+                <c:choose>
+                    <c:when test="${not empty js}">
+                        <input type="checkbox" id="js" class="fix-item" name="js" checked>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="checkbox" id="js" class="fix-item" name="js">
+                    </c:otherwise>
+                </c:choose>
                 <label for="js">js</label>
             </div>
         </div>
@@ -39,13 +94,20 @@
             </div>
             <div class="select-box-right">
                 <div class="select-box-right-input">
-                    <form action="">
-                        <input type="text" placeholder="확장자 입력">
-                    </form>
-                    <button>+추가</button>
+                    <input type="text" placeholder="확장자 입력" id="extension-name">
+                    <input type="submit" value="+추가" id="add-btn">
                 </div>
-                <div class="select-box-right-textarea">
-                    <textarea name="extension-list" id="extension-list" cols="30" rows="10"></textarea>
+                <div class="select-box-right-list">
+                    <div class="size-box">
+                        ${size}/200
+                    </div>
+                    <c:if test="${not empty extensionList}">
+                        <c:forEach var="extension" items="${extensionList}">
+                            <span class="extension-element">
+                                ${extension.name} <span class="x-btn" onclick="deleteExtension('${extension.name}')">&times;</span>
+                            </span>
+                        </c:forEach>
+                    </c:if>
                 </div>
             </div>
         </div>

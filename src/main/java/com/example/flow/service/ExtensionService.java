@@ -1,14 +1,12 @@
 package com.example.flow.service;
 
 import com.example.flow.dto.request.ExtensionRequestDto;
-import com.example.flow.dto.response.ExtensionResponseDto;
-
-import java.util.List;
+import com.example.flow.dto.response.ExtensionListResponseDto;
 
 public interface ExtensionService {
     Long createExtension(ExtensionRequestDto requestDto);
 
     void deleteExtension(String extensionName);
 
-    List<ExtensionResponseDto> findAllExtension();
+    ExtensionListResponseDto findAllExtension();
 }
