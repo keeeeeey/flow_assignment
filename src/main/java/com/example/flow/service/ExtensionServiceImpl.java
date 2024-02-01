@@ -1,5 +1,7 @@
 package com.example.flow.service;
 
+import com.example.flow.common.exception.ApiException;
+import com.example.flow.common.exception.ExceptionEnum;
 import com.example.flow.dto.request.ExtensionRequestDto;
 import com.example.flow.dto.response.ExtensionListResponseDto;
 import com.example.flow.dto.response.ExtensionResponseDto;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,9 @@ public class ExtensionServiceImpl implements ExtensionService {
     @Override
     @Transactional
     public Long createExtension(ExtensionRequestDto requestDto) {
+        Optional<Extension> extensionOptional = extensionRepository.findByName(requestDto.getName());
+        if (extensionOptional.isPresent()) throw new ApiException(ExceptionEnum.EXCEPTION_DUPLICATE_EXCEPTION);
+
         Extension extension = Extension.builder()
                 .name(requestDto.getName())
                 .build();
@@ -33,6 +39,8 @@ public class ExtensionServiceImpl implements ExtensionService {
     @Override
     @Transactional
     public void deleteExtension(String extensionName) {
+        Optional<Extension> extensionOptional = extensionRepository.findByName(extensionName);
+        if (extensionOptional.isEmpty()) throw new ApiException(ExceptionEnum.EXCEPTION_NOT_EXIST_EXCEPTION);
         extensionRepository.deleteByName(extensionName);
     }
 
@@ -56,10 +64,7 @@ public class ExtensionServiceImpl implements ExtensionService {
     }
 
     private boolean isFixExtension(String name) {
-        if (name.equals("bat") || name.equals("cmd") || name.equals("com") ||
-                name.equals("cpl") || name.equals("exe") || name.equals("scr") || name.equals("js")) {
-            return true;
-        }
-        return false;
+        return name.equals("bat") || name.equals("cmd") || name.equals("com") ||
+                name.equals("cpl") || name.equals("exe") || name.equals("scr") || name.equals("js");
     }
 }
