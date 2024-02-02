@@ -15,5 +15,6 @@ public class Extension {
     @Column(name = "extension_id")
     private Long id;
 
+    @Column(unique = true, length = 20)
     private String name;
 }

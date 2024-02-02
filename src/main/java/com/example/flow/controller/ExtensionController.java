@@ -3,6 +3,7 @@ package com.example.flow.controller;
 import com.example.flow.dto.BaseResponseDto;
 import com.example.flow.dto.request.ExtensionRequestDto;
 import com.example.flow.service.ExtensionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class ExtensionController {
     private final ExtensionService extensionService;
 
     @PostMapping()
-    public ResponseEntity<BaseResponseDto<Long>> createExtension(@RequestBody ExtensionRequestDto requestDto) {
+    public ResponseEntity<BaseResponseDto<Long>> createExtension(@RequestBody @Valid ExtensionRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new BaseResponseDto<>(201, "success", extensionService.createExtension(requestDto)));
     }
