@@ -8,7 +8,6 @@ import com.example.flow.dto.response.ExtensionResponseDto;
 import com.example.flow.entity.Extension;
 import com.example.flow.repository.ExtensionRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +17,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ExtensionServiceImpl implements ExtensionService {
 
     private final ExtensionRepository extensionRepository;
@@ -32,8 +30,8 @@ public class ExtensionServiceImpl implements ExtensionService {
         Extension extension;
         boolean fixExtensionFlag = isFixExtension(requestDto.getName());
         if (!fixExtensionFlag) {
-            List<Extension> customExtensionList = extensionRepository.findAllByIsFixExtensionIsFalse();
-            if (customExtensionList.size() >= 200)
+            Long countCustomExtension = extensionRepository.countByIsFixExtensionIsFalse();
+            if (countCustomExtension >= 2)
                 throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
 
             extension = Extension.of(requestDto, false);
