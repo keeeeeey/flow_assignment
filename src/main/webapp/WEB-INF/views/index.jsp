@@ -99,12 +99,12 @@
                 </div>
                 <div class="select-box-right-list">
                     <div class="size-box">
-                        ${size}/200
+                        <span id="extension-size">${size}</span>/200
                     </div>
                     <c:if test="${not empty extensionList}">
                         <c:forEach var="extension" items="${extensionList}">
-                            <span class="extension-element">
-                                ${extension.name} <span class="x-btn" onclick="deleteExtension('${extension.name}')">&times;</span>
+                            <span class="extension-element" id="${extension.name}">
+                                ${extension.name} <span class="x-btn" onclick="deleteCustomExtension('${extension.name}')">&times;</span>
                             </span>
                         </c:forEach>
                     </c:if>
