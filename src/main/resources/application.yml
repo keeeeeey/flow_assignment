@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: db
+
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
+
+logging.level:
+  org.hibernate.SQL: debug
