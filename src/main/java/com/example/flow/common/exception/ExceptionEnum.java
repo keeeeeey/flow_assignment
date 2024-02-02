@@ -12,8 +12,9 @@ public enum ExceptionEnum {
     API_NOT_EXIST_EXCEPTION(HttpStatus.NOT_FOUND, "E0003", "존재하지 않는 API 입니다."),
     API_METHOD_NOT_ALLOWED_EXCEPTION(HttpStatus.METHOD_NOT_ALLOWED, "E0004", "지원하지 않는 Method 입니다."),
     API_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST, "E0005", "파라미터 타입과 값을 확인하세요."),
-    EXCEPTION_NOT_EXIST_EXCEPTION(HttpStatus.NOT_FOUND, "E0006", "존재하지 않은 차단 확장자입니다."),
-    EXCEPTION_DUPLICATE_EXCEPTION(HttpStatus.BAD_REQUEST, "E0007", "이미 차단된 확장자입니다.");
+    EXTENSION_NOT_EXIST_EXCEPTION(HttpStatus.NOT_FOUND, "E0006", "존재하지 않은 차단 확장자입니다."),
+    EXTENSION_DUPLICATE_EXCEPTION(HttpStatus.BAD_REQUEST, "E0007", "이미 차단된 확장자입니다."),
+    MAX_EXTENSION_COUNT_OVER_EXCEPTION(HttpStatus.BAD_REQUEST, "E0008", "최대 저장 가능한 갯수를 초과했습니다.");
 
     private final HttpStatus status;
     private final String code;

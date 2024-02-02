@@ -27,11 +27,20 @@ public class ExtensionServiceImpl implements ExtensionService {
     @Transactional
     public Long createExtension(ExtensionRequestDto requestDto) {
         Optional<Extension> extensionOptional = extensionRepository.findByName(requestDto.getName());
-        if (extensionOptional.isPresent()) throw new ApiException(ExceptionEnum.EXCEPTION_DUPLICATE_EXCEPTION);
+        if (extensionOptional.isPresent()) throw new ApiException(ExceptionEnum.EXTENSION_DUPLICATE_EXCEPTION);
 
-        Extension extension = Extension.builder()
-                .name(requestDto.getName())
-                .build();
+        Extension extension;
+        boolean fixExtensionFlag = isFixExtension(requestDto.getName());
+        if (!fixExtensionFlag) {
+            List<Extension> customExtensionList = extensionRepository.findAllByIsFixExtensionIsFalse();
+            if (customExtensionList.size() >= 200)
+                throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
+
+            extension = Extension.of(requestDto, false);
+        } else {
+            extension = Extension.of(requestDto, true);
+        }
+
         Extension saveExtension = extensionRepository.save(extension);
         return saveExtension.getId();
     }
@@ -40,7 +49,7 @@ public class ExtensionServiceImpl implements ExtensionService {
     @Transactional
     public void deleteExtension(String extensionName) {
         Optional<Extension> extensionOptional = extensionRepository.findByName(extensionName);
-        if (extensionOptional.isEmpty()) throw new ApiException(ExceptionEnum.EXCEPTION_NOT_EXIST_EXCEPTION);
+        if (extensionOptional.isEmpty()) throw new ApiException(ExceptionEnum.EXTENSION_NOT_EXIST_EXCEPTION);
         extensionRepository.deleteByName(extensionName);
     }
 
@@ -53,7 +62,7 @@ public class ExtensionServiceImpl implements ExtensionService {
 
         allExtension.forEach(e -> {
             ExtensionResponseDto extensionResponseDto = new ExtensionResponseDto(e.getId(), e.getName());
-            if (isFixExtension(e.getName())) {
+            if (e.isFixExtension()) {
                 fixExtensionList.add(extensionResponseDto);
             } else {
                 extensionList.add(extensionResponseDto);

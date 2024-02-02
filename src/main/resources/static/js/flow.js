@@ -65,6 +65,8 @@ function createExtension(param) {
                     alert("이미 차단된 확장자입니다.");
                 } else if (e.responseJSON.code === 'E0005') {
                     alert("유효하지 않는 입력값입니다.");
+                } else if (e.responseJSON.code === 'E0008') {
+                    alert("저장 가능한 최대 갯수를 초과했습니다.");
                 } else {
                     alert("저장 실패");
                 }
