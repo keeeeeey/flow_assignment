@@ -31,24 +31,10 @@ public class ExtensionServiceImpl implements ExtensionService {
         Optional<Extension> extensionOptional = extensionRepository.findByName(requestDto.getName());
         if (extensionOptional.isPresent()) throw new ApiException(ExceptionEnum.EXTENSION_DUPLICATE_EXCEPTION);
 
-        Extension extension;
-        if (!isFixExtension(requestDto.getName())) {
-            Long countCustomExtension = extensionRepository.countByIsFixExtensionIsFalse();
-            if (countCustomExtension >= 2)
-                throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
-
-            extension = Extension.of(requestDto.getName(), false);
-        } else {
-            extension = Extension.of(requestDto.getName(), true);
-        }
+        Extension extension = makeExtension(requestDto.getName());
 
         Extension saveExtension = extensionRepository.save(extension);
-        try {
-            logService.logSave(requestDto.getName(), "post");
-        } catch (Exception e) {
-            log.info("log 저장에 실패했습니다. name = {}, method = {}", requestDto.getName(), "post");
-            log.info("정상 흐름 반환");
-        }
+        logSave(requestDto.getName(), "post");
         return saveExtension.getId();
     }
 
@@ -58,12 +44,7 @@ public class ExtensionServiceImpl implements ExtensionService {
         Optional<Extension> extensionOptional = extensionRepository.findByName(extensionName);
         if (extensionOptional.isEmpty()) throw new ApiException(ExceptionEnum.EXTENSION_NOT_EXIST_EXCEPTION);
         extensionRepository.deleteByName(extensionName);
-        try {
-            logService.logSave(extensionName, "delete");
-        } catch (Exception e) {
-            log.info("log 저장에 실패했습니다. name = {}, method = {}", extensionName, "delete");
-            log.info("정상 흐름 반환");
-        }
+        logSave(extensionName, "delete");
     }
 
     @Override
@@ -83,6 +64,22 @@ public class ExtensionServiceImpl implements ExtensionService {
         });
 
         return ExtensionListResponseDto.of(fixExtensionList, extensionList);
+    }
+
+    private Extension makeExtension(String extensionName) {
+        if (isFixExtension(extensionName)) return Extension.of(extensionName, true);
+        Long countCustomExtension = extensionRepository.countByIsFixExtensionIsFalse();
+        if (countCustomExtension >= 2) throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
+        return Extension.of(extensionName, false);
+    }
+
+    private void logSave(String extensionName, String method) {
+        try {
+            logService.logSave(extensionName, method);
+        } catch (Exception e) {
+            log.info("log 저장에 실패했습니다. name = {}, method = {}", extensionName, method);
+            log.info("정상 흐름 반환");
+        }
     }
 
     private boolean isFixExtension(String name) {
