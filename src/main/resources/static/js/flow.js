@@ -14,30 +14,40 @@ addBtn.on('click', function () {
     const inputBox = $('#extension-name');
     const inputData = inputBox.val();
 
+    if (!inputData.trim()) {
+        alert("값을 입력해주세요.");
+        inputBox.val("");
+        return;
+    }
+
+    if (isFixExtension(inputData)) {
+        alert("고정 확장자는 위 체크박스를 이용해주세요.");
+        inputBox.val("");
+        return;
+    }
+
     if (inputData.length > 20) {
         alert("글자 수는 20자 이하만 가능합니다.");
+        inputBox.val("");
         return;
     }
 
     let size = Number($("#extension-size").text());
     if (size >= 200) {
         alert("커스텀 확장자는 최대 200개만 추가가 가능합니다.");
+        inputBox.val("");
         return;
     }
 
-    if (!!inputData.trim()) {
-        createExtension(inputData).then(function () {
-            createHtmlElement(inputData);
-            $("#extension-size").text(size += 1);
-        });
-    } else {
-        alert("값을 입력해주세요.");
-    }
+    createExtension(inputData).then(function () {
+        createHtmlElement(inputData);
+        $("#extension-size").text(size += 1);
+    });
 
     inputBox.val("");
 });
 
-function deleteCustomExtension(param) {
+function deleteCustomExtension (param) {
     deleteExtension(param).then(function () {
         deleteHtmlElement(param);
         let size = Number($("#extension-size").text());
@@ -45,7 +55,7 @@ function deleteCustomExtension(param) {
     });
 }
 
-function createExtension(param) {
+function createExtension (param) {
     const data = {
         'name': param
     };
@@ -76,7 +86,7 @@ function createExtension(param) {
     });
 }
 
-function deleteExtension(param) {
+function deleteExtension (param) {
     return new Promise(function (resolve, reject) {
         $.ajax({
             type: "DELETE",
@@ -92,7 +102,7 @@ function deleteExtension(param) {
     });
 }
 
-function createHtmlElement(param) {
+function createHtmlElement (param) {
     const parentElement = $(".select-box-right-list");
     const newElement = $("<span>").html(param + " ").addClass("extension-element").attr("id", param);
     const closeBtn = $("<span>").html("&times").addClass("x-btn").on("click", function () {
@@ -102,7 +112,12 @@ function createHtmlElement(param) {
     parentElement.append(newElement);
 }
 
-function deleteHtmlElement(param) {
+function deleteHtmlElement (param) {
     const deleteElement = $("#" + param);
     deleteElement.remove();
+}
+
+function isFixExtension (param) {
+    return param === "bat" || param === "cmd" || param === "com" || param === "cpl" ||
+        param === "exe" || param === "scr" || param === "js";
 }
