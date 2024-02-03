@@ -6,13 +6,10 @@ import com.example.flow.dto.request.ExtensionRequestDto;
 import com.example.flow.dto.response.ExtensionListResponseDto;
 import com.example.flow.dto.response.ExtensionResponseDto;
 import com.example.flow.entity.Extension;
-import com.example.flow.entity.Log;
 import com.example.flow.repository.ExtensionRepository;
-import com.example.flow.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -26,7 +23,7 @@ public class ExtensionServiceImpl implements ExtensionService {
 
     private final ExtensionRepository extensionRepository;
 
-    private final LogRepository logRepository;
+    private final LogService logService;
 
     @Override
     @Transactional
@@ -35,20 +32,19 @@ public class ExtensionServiceImpl implements ExtensionService {
         if (extensionOptional.isPresent()) throw new ApiException(ExceptionEnum.EXTENSION_DUPLICATE_EXCEPTION);
 
         Extension extension;
-        boolean fixExtensionFlag = isFixExtension(requestDto.getName());
-        if (!fixExtensionFlag) {
+        if (!isFixExtension(requestDto.getName())) {
             Long countCustomExtension = extensionRepository.countByIsFixExtensionIsFalse();
             if (countCustomExtension >= 2)
                 throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
 
-            extension = Extension.of(requestDto, false);
+            extension = Extension.of(requestDto.getName(), false);
         } else {
-            extension = Extension.of(requestDto, true);
+            extension = Extension.of(requestDto.getName(), true);
         }
 
         Extension saveExtension = extensionRepository.save(extension);
         try {
-            logSave(requestDto.getName(), "post");
+            logService.logSave(requestDto.getName(), "post");
         } catch (Exception e) {
             log.info("log 저장에 실패했습니다. name = {}, method = {}", requestDto.getName(), "post");
             log.info("정상 흐름 반환");
@@ -63,7 +59,7 @@ public class ExtensionServiceImpl implements ExtensionService {
         if (extensionOptional.isEmpty()) throw new ApiException(ExceptionEnum.EXTENSION_NOT_EXIST_EXCEPTION);
         extensionRepository.deleteByName(extensionName);
         try {
-            logSave(extensionName, "delete");
+            logService.logSave(extensionName, "delete");
         } catch (Exception e) {
             log.info("log 저장에 실패했습니다. name = {}, method = {}", extensionName, "delete");
             log.info("정상 흐름 반환");
@@ -87,12 +83,6 @@ public class ExtensionServiceImpl implements ExtensionService {
         });
 
         return ExtensionListResponseDto.of(fixExtensionList, extensionList);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void logSave(String extensionName, String method) {
-        Log logData = Log.of(extensionName, method);
-        logRepository.save(logData);
     }
 
     private boolean isFixExtension(String name) {
