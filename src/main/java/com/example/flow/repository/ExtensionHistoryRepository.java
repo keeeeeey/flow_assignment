@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface ExtensionHistoryRepository extends JpaRepository<ExtensionHistory, Long> {
     Optional<ExtensionHistory> findByName(String name);
 
-    @Query("select eh.name from ExtensionHistory eh where eh.saveCount >= 2")
+    @Query("select eh.name from ExtensionHistory eh where eh.saveCount >= 10")
     List<String> findAllOverTen();
 }
