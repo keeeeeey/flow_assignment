@@ -14,11 +14,15 @@ import java.util.List;
 public class ExtensionListResponseDto {
     private List<ExtensionResponseDto> fixExtensionList;
     private List<ExtensionResponseDto> extensionList;
+    private List<ExtensionHistoryResponseDto> extensionOverTenList;
 
-    public static ExtensionListResponseDto of(List<ExtensionResponseDto> fixExtensionList, List<ExtensionResponseDto> extensionList) {
+    public static ExtensionListResponseDto of(List<ExtensionResponseDto> fixExtensionList,
+                                              List<ExtensionResponseDto> extensionList,
+                                              List<ExtensionHistoryResponseDto> extensionOverTenList) {
         return ExtensionListResponseDto.builder()
                 .fixExtensionList(fixExtensionList)
                 .extensionList(extensionList)
+                .extensionOverTenList(extensionOverTenList)
                 .build();
     }
 }

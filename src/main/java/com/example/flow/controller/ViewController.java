@@ -21,6 +21,7 @@ public class ViewController {
         });
         model.addAttribute("extensionList", allExtension.getExtensionList());
         model.addAttribute("size", allExtension.getExtensionList().size());
+        model.addAttribute("extensionOverTenList", allExtension.getExtensionOverTenList());
         return "index";
     }
 }

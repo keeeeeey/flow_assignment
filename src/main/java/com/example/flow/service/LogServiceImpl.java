@@ -14,7 +14,7 @@ public class LogServiceImpl implements LogService {
     private final LogRepository logRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void logSave(String extensionName, String method) {
+    public void saveLog(String extensionName, String method) {
         Log logData = Log.of(extensionName, method);
         logRepository.save(logData);
     }

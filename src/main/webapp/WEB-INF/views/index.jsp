@@ -86,6 +86,20 @@
                     </c:otherwise>
                 </c:choose>
                 <label for="js">js</label>
+
+                <c:if test="${not empty extensionOverTenList}">
+                    <c:forEach var="extension" items="${extensionOverTenList}">
+                        <c:choose>
+                            <c:when test="${extension.checked}">
+                                <input type="checkbox" id="${extension.name}" class="fix-item" name="${extension.name}" checked>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="checkbox" id="${extension.name}" class="fix-item" name="${extension.name}">
+                            </c:otherwise>
+                        </c:choose>
+                        <label for="${extension.name}">${extension.name}</label>
+                    </c:forEach>
+                </c:if>
             </div>
         </div>
         <div class="select-box">
