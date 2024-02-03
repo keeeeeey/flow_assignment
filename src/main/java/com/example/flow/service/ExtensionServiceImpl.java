@@ -44,6 +44,23 @@ public class ExtensionServiceImpl implements ExtensionService {
         return saveExtension.getId();
     }
 
+    private void saveExtensionHistory(ExtensionRequestDto requestDto) {
+        Optional<ExtensionHistory> extensionHistoryOptional = extensionHistoryRepository.findByName(requestDto.getName());
+        if (extensionHistoryOptional.isEmpty()) {
+            ExtensionHistory extensionHistory = ExtensionHistory.of(requestDto.getName(), 1);
+            extensionHistoryRepository.save(extensionHistory);
+        } else {
+            extensionHistoryOptional.get().plusSaveCount();
+        }
+    }
+
+    private Extension makeExtension(String extensionName) {
+        if (isFixExtension(extensionName)) return Extension.of(extensionName, true);
+        Long countCustomExtension = extensionRepository.countByIsFixExtensionIsFalse();
+        if (countCustomExtension >= 200) throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
+        return Extension.of(extensionName, false);
+    }
+
     @Override
     @Transactional
     public void deleteExtension(String extensionName) {
@@ -58,6 +75,7 @@ public class ExtensionServiceImpl implements ExtensionService {
     public ExtensionListResponseDto findAllExtension() {
         List<Extension> allExtension = extensionRepository.findAll();
         List<String> extensionOverTens = extensionHistoryRepository.findAllOverTen();
+
         List<ExtensionResponseDto> fixExtensionList = new ArrayList<>();
         List<ExtensionResponseDto> extensionList = new ArrayList<>();
 
@@ -85,21 +103,14 @@ public class ExtensionServiceImpl implements ExtensionService {
         return ExtensionListResponseDto.of(fixExtensionList, extensionList, extensionOverTenList);
     }
 
-    private void saveExtensionHistory(ExtensionRequestDto requestDto) {
-        Optional<ExtensionHistory> extensionHistoryOptional = extensionHistoryRepository.findByName(requestDto.getName());
-        if (extensionHistoryOptional.isEmpty()) {
-            ExtensionHistory extensionHistory = ExtensionHistory.of(requestDto.getName(), 1);
-            extensionHistoryRepository.save(extensionHistory);
-        } else {
-            extensionHistoryOptional.get().plusSaveCount();
-        }
+    private boolean isFixExtension(String name) {
+        List<String> extensionOverTenList = extensionHistoryRepository.findAllOverTen();
+        return isDefaultFixExtension(name) || extensionOverTenList.contains(name);
     }
 
-    private Extension makeExtension(String extensionName) {
-        if (isFixExtension(extensionName)) return Extension.of(extensionName, true);
-        Long countCustomExtension = extensionRepository.countByIsFixExtensionIsFalse();
-        if (countCustomExtension >= 200) throw new ApiException(ExceptionEnum.MAX_EXTENSION_COUNT_OVER_EXCEPTION);
-        return Extension.of(extensionName, false);
+    private boolean isDefaultFixExtension(String name) {
+        return name.equals("bat") || name.equals("cmd") || name.equals("com") || name.equals("cpl") ||
+                name.equals("exe") || name.equals("scr") || name.equals("js");
     }
 
     private void saveLog(String extensionName, String method) {
@@ -111,13 +122,4 @@ public class ExtensionServiceImpl implements ExtensionService {
         }
     }
 
-    private boolean isFixExtension(String name) {
-        List<String> extensionOverTenList = extensionHistoryRepository.findAllOverTen();
-        return isDefaultFixExtension(name) || extensionOverTenList.contains(name);
-    }
-
-    private boolean isDefaultFixExtension(String name) {
-        return name.equals("bat") || name.equals("cmd") || name.equals("com") || name.equals("cpl") ||
-                name.equals("exe") || name.equals("scr") || name.equals("js");
-    }
 }
