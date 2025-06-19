@@ -11,4 +11,6 @@ public interface CustomExtensionRepository extends JpaRepository<CustomExtension
     }
 
     Long countAllBy();
+
+    boolean existsByName(String name);
 }

@@ -11,10 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -34,6 +32,10 @@ public class CustomExtensionService {
         boolean isFixed = Arrays.stream(FixedExtensionType.values())
                 .anyMatch(type -> type.name().equalsIgnoreCase(request.getName()));
         if (isFixed) throw new BusinessException(ErrorCode.FORBIDDEN_FIXED_EXTENSION);
+
+        // 커스텀 확장자 중복체크
+        boolean isExist = repository.existsByName(request.getName());
+        if (isExist) throw new BusinessException(ErrorCode.ALREADY_CREATED_EXTENSION);
 
         // 커스텀 확장자 저장
         CustomExtension customExtension = CustomExtension.builder()

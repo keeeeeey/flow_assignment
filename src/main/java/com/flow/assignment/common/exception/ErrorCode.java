@@ -14,6 +14,7 @@ public enum ErrorCode {
     ACCESS_DENIED(403, "C005", "Access denied"),
     INTERNAL_SERVER_ERROR(500, "C006", "Internal server error"),
     ENTITY_NOT_FOUND(404, "C007", "Not Found"),
+    ALREADY_CREATED_EXTENSION(400, "C008", "Already created extension"),
 
 
     // CustomException
