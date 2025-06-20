@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -20,42 +19,55 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class CustomExtensionService {
 
+    private static final long MAX_CUSTOM_EXTENSION_COUNT = 200;
+
     private final CustomExtensionRepository repository;
 
     @Transactional
-    public String create(CreateCustomExtensionRequest request) {
-        // 커스텀 확장자 개수 체크
-        Long count = repository.countAllBy();
-        if (count > 199) throw new BusinessException(ErrorCode.EXCEED_TOTAL_CUSTOM_COUNT);
+    public CustomExtensionResponse create(CreateCustomExtensionRequest request) {
+        validateCreatableExtension(request.getName());
 
-        // 고정 확장자 추가 시도 예외처리
-        boolean isFixed = Arrays.stream(FixedExtensionType.values())
-                .anyMatch(type -> type.name().equalsIgnoreCase(request.getName()));
-        if (isFixed) throw new BusinessException(ErrorCode.FORBIDDEN_FIXED_EXTENSION);
-
-        // 커스텀 확장자 중복체크
-        boolean isExist = repository.existsByName(request.getName());
-        if (isExist) throw new BusinessException(ErrorCode.ALREADY_CREATED_EXTENSION);
-
-        // 커스텀 확장자 저장
         CustomExtension customExtension = CustomExtension.builder()
                 .name(request.getName())
                 .build();
+
         repository.save(customExtension);
-        return request.getName();
+        return CustomExtensionResponse.fromEntity(customExtension);
+    }
+
+    private void validateCreatableExtension(String name) {
+        // 커스텀 확장자 개수 체크
+        if (repository.countAllBy() >= MAX_CUSTOM_EXTENSION_COUNT) {
+            throw new BusinessException(ErrorCode.EXCEED_TOTAL_CUSTOM_COUNT);
+        }
+
+        // 고정 확장자 추가 시도 예외처리
+        if (isFixedExtension(name)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_FIXED_EXTENSION);
+        }
+
+        // 커스텀 확장자 중복체크
+        if (repository.existsByName(name)) {
+            throw new BusinessException(ErrorCode.ALREADY_CREATED_EXTENSION);
+        }
+    }
+
+    private boolean isFixedExtension(String name) {
+        return FixedExtensionType.getNames().stream()
+                .anyMatch(fixedName -> fixedName.equalsIgnoreCase(name));
     }
 
     @Transactional
     public void delete(Long id) {
-        CustomExtension customExtension = repository.findByIdOrElseThrow(id);
-        repository.delete(customExtension);
+        if (!repository.existsById(id)) {
+            throw new BusinessException(ErrorCode.ALREADY_DELETED_EXTENSION);
+        }
+        repository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
     public List<CustomExtensionResponse> get() {
-        List<CustomExtension> customExtensions = repository.findAll();
-        return customExtensions
-                .stream()
+        return repository.findAll().stream()
                 .map(CustomExtensionResponse::fromEntity)
                 .collect(toList());
     }

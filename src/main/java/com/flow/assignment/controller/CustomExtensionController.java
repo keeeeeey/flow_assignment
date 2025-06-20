@@ -20,11 +20,10 @@ public class CustomExtensionController {
     private final CustomExtensionService service;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<Void>> create(
+    public ResponseEntity<BaseResponse<CustomExtensionResponse>> create(
             @RequestBody @Valid CreateCustomExtensionRequest request
     ) {
-        service.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.from(null));
+        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.from(service.create(request)));
     }
 
     @DeleteMapping("{id}")

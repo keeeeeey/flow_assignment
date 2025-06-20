@@ -3,6 +3,7 @@ package com.flow.assignment.controller;
 import com.flow.assignment.dto.request.CreateFixedExtensionRequest;
 import com.flow.assignment.dto.response.BaseResponse;
 import com.flow.assignment.dto.response.CustomExtensionResponse;
+import com.flow.assignment.dto.response.FixedExtensionResponse;
 import com.flow.assignment.service.FixedExtensionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,25 +19,17 @@ import java.util.List;
 public class FixedExtensionController {
 
     private final FixedExtensionService service;
-//
-//    @PostMapping
-//    public ResponseEntity<BaseResponse<String>> create(
-//            @RequestBody @Valid CreateFixedExtensionRequest request
-//    ) {
-//        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.from(service.create(request)));
-//    }
-//
-//    @DeleteMapping("{id}")
-//    public ResponseEntity<BaseResponse<Void>> delete(
-//            @PathVariable(name = "id") Long id
-//    ) {
-//        service.delete(id);
-//        return ResponseEntity.ok(BaseResponse.from(null));
-//    }
-//
-//    @GetMapping
-//    public ResponseEntity<BaseResponse<List<CustomExtensionResponse>>> get(
-//    ) {
-//        return ResponseEntity.ok(BaseResponse.from(service.get()));
-//    }
+
+    @PatchMapping
+    public ResponseEntity<BaseResponse<FixedExtensionResponse>> update(
+            @RequestBody CreateFixedExtensionRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.from(service.update(request)));
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<List<FixedExtensionResponse>>> get(
+    ) {
+        return ResponseEntity.ok(BaseResponse.from(service.get()));
+    }
 }

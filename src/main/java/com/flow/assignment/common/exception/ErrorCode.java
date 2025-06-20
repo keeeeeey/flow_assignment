@@ -15,6 +15,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "C006", "Internal server error"),
     ENTITY_NOT_FOUND(404, "C007", "Not Found"),
     ALREADY_CREATED_EXTENSION(400, "C008", "Already created extension"),
+    ALREADY_DELETED_EXTENSION(400, "C009", "Already deleted extension"),
 
 
     // CustomException

@@ -1,4 +1,5 @@
 window.onload = function () {
+    loadFixedExtensions();
     loadCustomExtensions();
 };
 
@@ -88,4 +89,50 @@ async function removeTag(button) {
 function updateCount() {
     const count = document.querySelectorAll('#tagContainer .tag').length;
     document.getElementById('extCount').textContent = `${count}/200`;
+}
+
+async function toggleFixedExtension(name, isChecked) {
+    try {
+        // 1. PATCH 요청
+        await fetch('/api/extension/fixed', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, isChecked })
+        });
+
+        // 2. 다시 목록 불러오기
+        // await loadFixedExtensions();
+    } catch (error) {
+        console.error('고정 확장자 업데이트 실패:', error);
+        alert('고정 확장자 저장에 실패했습니다.');
+    }
+}
+
+async function loadFixedExtensions() {
+    try {
+        const response = await fetch('/api/extension/fixed');
+        const result = await response.json();
+
+        const container = document.getElementById('fixedContainer');
+        container.innerHTML = '';
+
+        result.data.forEach(item => {
+            const id = `fixed-${item.name}`;
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = id;
+            checkbox.checked = item.isChecked;
+            checkbox.onclick = () => toggleFixedExtension(item.name, checkbox.checked);
+
+            const label = document.createElement('label');
+            label.htmlFor = id;
+            label.textContent = item.name;
+
+            container.appendChild(checkbox);
+            container.appendChild(label);
+        });
+
+    } catch (error) {
+        console.error('고정 확장자 목록 불러오기 실패:', error);
+    }
 }
