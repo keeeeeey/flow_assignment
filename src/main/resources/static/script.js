@@ -46,13 +46,29 @@ async function addExtension() {
 
         if (!response.ok) {
             const error = await response.json();
-            alert("추가 실패: " + (error.message || response.statusText));
+
+            let message = "아래와 같은 이유로 추가 실패:\n";
+
+            if (error.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+                error.errors.forEach(err => {
+                    message += `- ${err.reason}\n`;
+                });
+            } else {
+                message += `- ${error.message}`;
+            }
+
+            alert(message);
             return;
         }
+
+        const result = await response.json();
+        const data = result.data;
+        const id = data.id;
 
         // 성공 시 태그 추가
         const span = document.createElement('span');
         span.className = 'tag';
+        span.setAttribute('data-id', id)
         span.innerHTML = `${value} <button onclick="removeTag(this)">×</button>`;
         container.appendChild(span);
         updateCount();
@@ -74,7 +90,7 @@ async function removeTag(button) {
 
         if (!response.ok) {
             const error = await response.json();
-            alert("삭제 실패: " + (error.message || response.statusText));
+            alert("삭제 실패: " + error.message);
             return;
         }
 
@@ -89,23 +105,6 @@ async function removeTag(button) {
 function updateCount() {
     const count = document.querySelectorAll('#tagContainer .tag').length;
     document.getElementById('extCount').textContent = `${count}/200`;
-}
-
-async function toggleFixedExtension(name, isChecked) {
-    try {
-        // 1. PATCH 요청
-        await fetch('/api/extension/fixed', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, isChecked })
-        });
-
-        // 2. 다시 목록 불러오기
-        // await loadFixedExtensions();
-    } catch (error) {
-        console.error('고정 확장자 업데이트 실패:', error);
-        alert('고정 확장자 저장에 실패했습니다.');
-    }
 }
 
 async function loadFixedExtensions() {
@@ -134,5 +133,24 @@ async function loadFixedExtensions() {
 
     } catch (error) {
         console.error('고정 확장자 목록 불러오기 실패:', error);
+    }
+}
+
+async function toggleFixedExtension(name, isChecked) {
+    try {
+        const response = await fetch('/api/extension/fixed', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, isChecked })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            alert("업데이트 실패: " + error.message);
+            loadFixedExtensions();
+        }
+    } catch (error) {
+        console.error('고정 확장자 업데이트 실패:', error);
+        alert('고정 확장자 저장에 실패했습니다.');
     }
 }

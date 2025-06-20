@@ -2,10 +2,8 @@ package com.flow.assignment.controller;
 
 import com.flow.assignment.dto.request.CreateFixedExtensionRequest;
 import com.flow.assignment.dto.response.BaseResponse;
-import com.flow.assignment.dto.response.CustomExtensionResponse;
 import com.flow.assignment.dto.response.FixedExtensionResponse;
 import com.flow.assignment.service.FixedExtensionService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

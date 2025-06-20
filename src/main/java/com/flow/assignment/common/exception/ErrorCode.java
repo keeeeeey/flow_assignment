@@ -8,14 +8,12 @@ import lombok.Getter;
 public enum ErrorCode {
 
     // Common
-    INVALID_TYPE_VALUE(400, "C001", "Invalid type value"),
-    INVALID_INPUT_VALUE(400, "C003", "Invalid input value"),
-    METHOD_NOT_ALLOWED(405, "C004", "Method not allowed"),
-    ACCESS_DENIED(403, "C005", "Access denied"),
-    INTERNAL_SERVER_ERROR(500, "C006", "Internal server error"),
-    ENTITY_NOT_FOUND(404, "C007", "Not Found"),
-    ALREADY_CREATED_EXTENSION(400, "C008", "Already created extension"),
-    ALREADY_DELETED_EXTENSION(400, "C009", "Already deleted extension"),
+    INVALID_INPUT_VALUE(400, "C001", "Invalid input value"),
+    METHOD_NOT_ALLOWED(405, "C002", "Method not allowed"),
+    INTERNAL_SERVER_ERROR(500, "C003", "Internal server error"),
+    ENTITY_NOT_FOUND(404, "C004", "Entity not found"),
+    ALREADY_CREATED_EXTENSION(400, "C005", "Already created extension"),
+    ALREADY_DELETED_EXTENSION(400, "C006", "Already deleted extension"),
 
 
     // CustomException

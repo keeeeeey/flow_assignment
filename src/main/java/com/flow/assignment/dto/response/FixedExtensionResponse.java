@@ -1,6 +1,5 @@
 package com.flow.assignment.dto.response;
 
-import com.flow.assignment.entity.CustomExtension;
 import com.flow.assignment.entity.FixedExtension;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
