@@ -28,7 +28,7 @@ async function loadCustomExtensions() {
     }
 }
 
-async function addExtension() {
+async function addCustomExtension() {
     const input = document.getElementById('customExtInput');
     const value = input.value.trim();
     const container = document.getElementById('tagContainer');
@@ -47,14 +47,13 @@ async function addExtension() {
         if (!response.ok) {
             const error = await response.json();
 
-            let message = "아래와 같은 이유로 추가 실패:\n";
+            let message = `${error.message}\n`;
 
             if (error.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+                message += "\n아래와 같은 이유로 추가 실패:\n";
                 error.errors.forEach(err => {
                     message += `- ${err.reason}\n`;
                 });
-            } else {
-                message += `- ${error.message}`;
             }
 
             alert(message);
