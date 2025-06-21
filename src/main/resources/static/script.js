@@ -1,156 +1,146 @@
-window.onload = function () {
+$(window).on('load', function () {
     loadFixedExtensions();
     loadCustomExtensions();
-};
+});
 
-async function loadCustomExtensions() {
-    try {
-        const response = await fetch('/api/extension/custom');
-        if (!response.ok) throw new Error("불러오기 실패");
+function loadCustomExtensions() {
+    $.ajax({
+        url: '/api/extension/custom',
+        method: 'GET',
+        success: function (result) {
+            const extensions = result.data || [];
+            const $container = $('#tagContainer').empty();
 
-        const result = await response.json();
-        const extensions = result.data || [];
-        const container = document.getElementById('tagContainer');
-        container.innerHTML = '';
+            $.each(extensions, function (_, ext) {
+                const $span = $('<span>', {
+                    class: 'tag',
+                    'data-id': ext.id,
+                    html: `${ext.name} <button onclick="removeTag(this)">×</button>`
+                });
+                $container.append($span);
+            });
 
-        extensions.forEach(ext => {
-            const span = document.createElement('span');
-            span.className = 'tag';
-            span.setAttribute('data-id', ext.id);
-            span.innerHTML = `${ext.name} <button onclick="removeTag(this)">×</button>`;
-            container.appendChild(span);
-        });
-
-        updateCount();
-    } catch (err) {
-        console.error('불러오기 오류:', err);
-        alert("커스텀 확장자 목록을 불러오는 데 실패했습니다.");
-    }
+            updateCount();
+        },
+        error: function (xhr) {
+            console.error('불러오기 오류:', xhr);
+            alert("커스텀 확장자 목록을 불러오는 데 실패했습니다.");
+        }
+    });
 }
 
-async function addCustomExtension() {
-    const input = document.getElementById('customExtInput');
-    const value = input.value.trim();
-    const container = document.getElementById('tagContainer');
+function addCustomExtension() {
+    const value = $('#customExtInput').val().trim();
+    const $container = $('#tagContainer');
 
     if (!value) return;
 
-    try {
-        const response = await fetch('/api/extension/custom', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name: value })
-        });
+    $.ajax({
+        url: '/api/extension/custom',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ name: value }),
+        success: function (result) {
+            const id = result.data.id;
 
-        if (!response.ok) {
-            const error = await response.json();
+            const $span = $('<span>', {
+                class: 'tag',
+                'data-id': id,
+                html: `${value} <button onclick="removeTag(this)">×</button>`
+            });
 
-            let message = `${error.message}\n`;
+            $container.append($span);
+            updateCount();
+            $('#customExtInput').val('');
+        },
+        error: function (xhr) {
+            let message = '추가 실패';
 
-            if (error.errors && Array.isArray(error.errors) && error.errors.length > 0) {
-                message += "\n아래와 같은 이유로 추가 실패:\n";
-                error.errors.forEach(err => {
-                    message += `- ${err.reason}\n`;
-                });
+            try {
+                const error = xhr.responseJSON;
+                message = `${error.message}\n`;
+
+                if (Array.isArray(error.errors) && error.errors.length > 0) {
+                    message += "\n아래와 같은 이유로 추가 실패:\n";
+                    $.each(error.errors, function (_, err) {
+                        message += `- ${err.reason}\n`;
+                    });
+                }
+            } catch (e) {
+                console.error('응답 파싱 실패:', e);
             }
 
             alert(message);
             loadCustomExtensions();
-            return;
         }
-
-        const result = await response.json();
-        const data = result.data;
-        const id = data.id;
-
-        const span = document.createElement('span');
-        span.className = 'tag';
-        span.setAttribute('data-id', id)
-        span.innerHTML = `${value} <button onclick="removeTag(this)">×</button>`;
-        container.appendChild(span);
-        updateCount();
-        input.value = '';
-    } catch (error) {
-        console.error('API 호출 중 오류 발생:', error);
-        alert("서버 오류가 발생했습니다.");
-    }
+    });
 }
 
-async function removeTag(button) {
-    const tag = button.parentElement;
-    const id = tag.getAttribute('data-id');
+function removeTag(button) {
+    const $tag = $(button).parent();
+    const id = $tag.data('id');
 
-    try {
-        const response = await fetch(`/api/extension/custom/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            alert("삭제 실패: " + error.message);
+    $.ajax({
+        url: `/api/extension/custom/${id}`,
+        method: 'DELETE',
+        success: function () {
+            $tag.remove();
+            updateCount();
+        },
+        error: function (xhr) {
+            console.error('삭제 오류:', xhr);
+            alert("삭제 실패: " + (xhr.responseJSON?.message || '알 수 없는 오류'));
             loadCustomExtensions();
-            return;
         }
-
-        tag.remove();
-        updateCount();
-    } catch (err) {
-        console.error('삭제 오류:', err);
-        alert("서버 오류가 발생했습니다.");
-    }
+    });
 }
 
 function updateCount() {
-    const count = document.querySelectorAll('#tagContainer .tag').length;
-    document.getElementById('extCount').textContent = `${count}/200`;
+    const count = $('#tagContainer .tag').length;
+    $('#extCount').text(`${count}/200`);
 }
 
-async function loadFixedExtensions() {
-    try {
-        const response = await fetch('/api/extension/fixed');
-        const result = await response.json();
+function loadFixedExtensions() {
+    $.ajax({
+        url: '/api/extension/fixed',
+        method: 'GET',
+        success: function (result) {
+            const $container = $('#fixedContainer').empty();
 
-        const container = document.getElementById('fixedContainer');
-        container.innerHTML = '';
+            $.each(result.data, function (_, item) {
+                const id = `fixed-${item.name}`;
+                const $checkbox = $('<input>', {
+                    type: 'checkbox',
+                    id: id,
+                    checked: item.isChecked
+                }).on('click', function () {
+                    toggleFixedExtension(item.name, this.checked);
+                });
 
-        result.data.forEach(item => {
-            const id = `fixed-${item.name}`;
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = id;
-            checkbox.checked = item.isChecked;
-            checkbox.onclick = () => toggleFixedExtension(item.name, checkbox.checked);
+                const $label = $('<label>', {
+                    for: id,
+                    text: item.name
+                });
 
-            const label = document.createElement('label');
-            label.htmlFor = id;
-            label.textContent = item.name;
-
-            container.appendChild(checkbox);
-            container.appendChild(label);
-        });
-
-    } catch (error) {
-        console.error('고정 확장자 목록 불러오기 실패:', error);
-    }
+                $container.append($checkbox).append($label);
+            });
+        },
+        error: function (xhr) {
+            console.error('고정 확장자 목록 불러오기 실패:', xhr);
+        }
+    });
 }
 
-async function toggleFixedExtension(name, isChecked) {
-    try {
-        const response = await fetch('/api/extension/fixed', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, isChecked })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            alert("업데이트 실패: " + error.message);
+function toggleFixedExtension(name, isChecked) {
+    $.ajax({
+        url: '/api/extension/fixed',
+        method: 'PATCH',
+        contentType: 'application/json',
+        data: JSON.stringify({ name, isChecked }),
+        error: function (xhr) {
+            console.error('고정 확장자 업데이트 실패:', xhr);
+            alert("업데이트 실패: " + (xhr.responseJSON?.message || '알 수 없는 오류'));
             loadFixedExtensions();
         }
-    } catch (error) {
-        console.error('고정 확장자 업데이트 실패:', error);
-        alert('고정 확장자 저장에 실패했습니다.');
-    }
+    });
 }
