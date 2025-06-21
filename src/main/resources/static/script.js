@@ -11,7 +11,7 @@ async function loadCustomExtensions() {
         const result = await response.json();
         const extensions = result.data || [];
         const container = document.getElementById('tagContainer');
-        container.innerHTML = ''; // 초기화
+        container.innerHTML = '';
 
         extensions.forEach(ext => {
             const span = document.createElement('span');
@@ -57,6 +57,7 @@ async function addCustomExtension() {
             }
 
             alert(message);
+            loadCustomExtensions();
             return;
         }
 
@@ -64,7 +65,6 @@ async function addCustomExtension() {
         const data = result.data;
         const id = data.id;
 
-        // 성공 시 태그 추가
         const span = document.createElement('span');
         span.className = 'tag';
         span.setAttribute('data-id', id)
@@ -90,6 +90,7 @@ async function removeTag(button) {
         if (!response.ok) {
             const error = await response.json();
             alert("삭제 실패: " + error.message);
+            loadCustomExtensions();
             return;
         }
 
